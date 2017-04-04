@@ -572,6 +572,9 @@ static struct task_struct *dup_task_struct(struct task_struct *orig, int node)
 	tsk->stack_canary = get_random_canary();
 #endif
 
+	if (orig->cpus_ptr == &orig->cpus_mask)
+		tsk->cpus_ptr = &tsk->cpus_mask;
+
 	/* One for the user space visible state that goes away when reaped. */
 	refcount_set(&tsk->rcu_users, 1);
 	/* One for the rcu users, and one for the scheduler */
