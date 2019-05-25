@@ -350,9 +350,6 @@ cmd_mkdtimg = python3 $(srctree)/scripts/dtc/mkdtboimg.py create $@ --page_size=
 quiet_cmd_cat = CAT     $@
 cmd_cat = (cat $(filter-out FORCE,$^) > $@) || (rm -f $@; false)
 
-# Bzip2
-# ---------------------------------------------------------------------------
-
 # Lzma
 # ---------------------------------------------------------------------------
 
