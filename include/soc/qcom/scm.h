@@ -186,6 +186,10 @@ static inline int scm_enable_mem_protection(void)
 {
 	return 0;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 16e21de02dbe (memlat: don't read perf event if other CPU is under scm call)
 extern bool under_scm_call(void)
 {
 	return false;
