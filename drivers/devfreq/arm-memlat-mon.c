@@ -149,6 +149,13 @@ static void delete_events(struct cpu_pmu_stats *cpustats)
 {
 	int i;
 
+	/*
+	 * Some of SCM call is very heavy(+20ms) so perf IPI could
+	 * be stuck on the CPU which contributes long latency.
+	 */
+	if (under_scm_call())
+		return;
+
 	for (i = 0; i < ARRAY_SIZE(cpustats->events); i++) {
 		cpustats->events[i].prev_count = 0;
 		if (cpustats->events[i].pevent) {
