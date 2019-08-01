@@ -722,14 +722,17 @@ ifeq ($(cc-name),gcc)
 KBUILD_CFLAGS	+= $(GC_FLAGS)
 KBUILD_AFLAGS   += $(GC_FLAGS)
 KBUILD_LDFLAGS  += $(GC_FLAGS)
+KBUILD_CFLAGS	+= -mcpu=cortex-a76.cortex-a55 -mtune=cortex-a76.cortex-a55
 endif
 ifeq ($(cc-name),clang)
 KBUILD_CFLAGS	+= $(CL_FLAGS)
 KBUILD_AFLAGS   += $(CL_FLAGS)
 KBUILD_LDFLAGS  += $(CL_FLAGS)
+KBUILD_CFLAGS	+= -mcpu=cortex-a55 -mtune=cortex-a55
 endif
 else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
+
 endif
 
 # Tell compiler to use pipes instead of temporary files during compilation
