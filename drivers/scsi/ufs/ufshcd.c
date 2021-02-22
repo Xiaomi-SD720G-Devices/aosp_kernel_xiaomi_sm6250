@@ -3737,7 +3737,7 @@ static void ufshcd_pm_qos_get_worker(struct work_struct *work)
 
 	mutex_lock(&hba->pm_qos.lock);
 	if (atomic_read(&hba->pm_qos.count) && !hba->pm_qos.active) {
-		pm_qos_update_request(&hba->pm_qos.req, 67);
+		pm_qos_update_request(&hba->pm_qos.req, 100);
 		hba->pm_qos.active = true;
 	}
 	mutex_unlock(&hba->pm_qos.lock);
@@ -3805,11 +3805,7 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 
 	err = ufshcd_get_read_lock(hba, cmd->device->lun);
 	if (unlikely(err < 0)) {
-		if (err == -EPERM) {
-			err = SCSI_MLQUEUE_HOST_BUSY;
-			goto out_pm_qos;
-		}
-		if (err == -EAGAIN) {
+		if (err == -EPERM || err == -EAGAIN) {
 			err = SCSI_MLQUEUE_HOST_BUSY;
 			goto out_pm_qos;
 		}
@@ -6527,6 +6523,9 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba,
 			result = ufshcd_transfer_rsp_status(hba, lrbp);
 			scsi_dma_unmap(cmd);
 			cmd->result = result;
+			
+			if (cmd->request)
+				ufshcd_pm_qos_put(hba);
 			lrbp->complete_time_stamp = ktime_get();
 			update_req_stats(hba, lrbp);
 			ufshcd_complete_lrbp_crypto(hba, cmd, lrbp);
@@ -6604,6 +6603,8 @@ void ufshcd_abort_outstanding_transfer_requests(struct ufs_hba *hba, int result)
 					UFS_ERR_INT_FATAL_ERRORS);
 			scsi_dma_unmap(cmd);
 			cmd->result = result;
+			if (cmd->request)
+				ufshcd_pm_qos_put(hba);
 			/* Clear pending transfer requests */
 			ufshcd_clear_cmd(hba, index);
 			ufshcd_outstanding_req_clear(hba, index);
