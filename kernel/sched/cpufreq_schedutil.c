@@ -20,6 +20,8 @@
 #include "sched.h"
 
 #define SUGOV_KTHREAD_PRIORITY	50
+#define UP_RATE_LIMIT_US		(1000)
+#define DOWN_RATE_LIMIT_US		(1000)
 
 struct sugov_tunables {
 	struct gov_attr_set attr_set;
@@ -778,10 +780,8 @@ static int sugov_init(struct cpufreq_policy *policy)
 		goto stop_kthread;
 	}
 
-	tunables->up_rate_limit_us =
-				cpufreq_policy_transition_delay_us(policy);
-	tunables->down_rate_limit_us =
-				cpufreq_policy_transition_delay_us(policy);
+	tunables->up_rate_limit_us = UP_RATE_LIMIT_US;
+	tunables->down_rate_limit_us = DOWN_RATE_LIMIT_US;
 	tunables->iowait_boost_enable = false;
 
 	policy->governor_data = sg_policy;
