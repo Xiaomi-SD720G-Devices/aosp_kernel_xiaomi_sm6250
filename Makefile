@@ -698,6 +698,13 @@ ARCH_CFLAGS :=
 include arch/$(SRCARCH)/Makefile
 
 KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+
+GC_FLAGS += -O3 -mcpu=cortex-a76.cortex-a55+crypto+crc
+CL_FLAGS += -O3 -mcpu=cortex-a55+crypto+crc
+
+export GC_FLAGS
+export CL_FLAGS
+
 KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
@@ -711,6 +718,16 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
 KBUILD_CFLAGS   += -O2
 else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
 KBUILD_CFLAGS   += -O3
+ifeq ($(cc-name),gcc)
+KBUILD_CFLAGS	+= $(GC_FLAGS)
+KBUILD_AFLAGS   += $(GC_FLAGS)
+KBUILD_LDFLAGS  += $(GC_FLAGS)
+endif
+ifeq ($(cc-name),clang)
+KBUILD_CFLAGS	+= $(CL_FLAGS)
+KBUILD_AFLAGS   += $(CL_FLAGS)
+KBUILD_LDFLAGS  += $(CL_FLAGS)
+endif
 else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 endif
@@ -792,7 +809,7 @@ KBUILD_CFLAGS += $(call cc-option,-fno-delete-null-pointer-checks,)
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
 
 ifeq ($(ld-name),lld)
-LDFLAGS += -O2
+LDFLAGS += -O3 --strip-debug
 endif
 
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
