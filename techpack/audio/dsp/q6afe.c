@@ -2,6 +2,10 @@
  * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
  * SPDX-License-Identifier: GPL-2.0-only
 */
+
+#undef pr_info
+#undef pr_debug
+
 #include <linux/slab.h>
 #include <linux/debugfs.h>
 #include <linux/kernel.h>

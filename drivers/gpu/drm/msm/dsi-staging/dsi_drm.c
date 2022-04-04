@@ -14,6 +14,10 @@
 
 
 #define pr_fmt(fmt)	"dsi-drm:[%s] " fmt, __func__
+
+#undef pr_info
+#undef pr_debug
+
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_atomic.h>
 
