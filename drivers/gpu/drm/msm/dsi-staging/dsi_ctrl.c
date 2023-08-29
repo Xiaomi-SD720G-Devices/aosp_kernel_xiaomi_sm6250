@@ -1863,7 +1863,7 @@ static int dsi_ctrl_dev_probe(struct platform_device *pdev)
 
 	dsi_ctrl->pdev = pdev;
 	platform_set_drvdata(pdev, dsi_ctrl);
-	pr_info("Probe successful for %s\n", dsi_ctrl->name);
+	pr_debug("Probe successful for %s\n", dsi_ctrl->name);
 
 	return 0;
 
