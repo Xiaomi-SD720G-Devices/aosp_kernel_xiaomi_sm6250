@@ -336,7 +336,7 @@ static int __init devfreq_boost_init(void)
 	}
 
 	d->msm_drm_notif.notifier_call = msm_drm_notifier_cb;
-	d->msm_drm_notif.priority = INT_MAX;
+	d->msm_drm_notif.priority = INT_MAX - 2;
 	ret = msm_drm_register_client(&d->msm_drm_notif);
 	if (ret) {
 		pr_err("Failed to register msm_drm notifier, err: %d\n", ret);
