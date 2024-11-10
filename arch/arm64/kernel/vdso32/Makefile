@@ -9,6 +9,7 @@ ifeq ($(cc-name),clang)
 else
   CC_ARM32 := $(CROSS_COMPILE_ARM32)$(cc-name)
 endif
+LD_ARM32 ?= ld.lld
 
 # Same as cc-*option, but using CC_ARM32 instead of CC
 cc32-option = $(call try-run,\
