@@ -89,8 +89,8 @@ walt_dec_cfs_rq_stats(struct cfs_rq *cfs_rq, struct task_struct *p) {}
  *
  * (default: 6ms * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_latency			= 6000000ULL;
-unsigned int normalized_sysctl_sched_latency		= 6000000ULL;
+unsigned int sysctl_sched_latency			= 32000000ULL;
+unsigned int normalized_sysctl_sched_latency		= 32000000ULL;
 
 /*
  * Enable/disable honoring sync flag in energy-aware wakeups.
@@ -147,8 +147,8 @@ unsigned int __read_mostly sysctl_sched_energy_aware = 1;
  *
  * (default: 1 msec * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_wakeup_granularity		= 1000000UL;
-unsigned int normalized_sysctl_sched_wakeup_granularity	= 1000000UL;
+unsigned int sysctl_sched_wakeup_granularity		= 8000000ULL;
+unsigned int normalized_sysctl_sched_wakeup_granularity	= 8000000ULL;
 
 const_debug unsigned int sysctl_sched_migration_cost	= 0UL;
 DEFINE_PER_CPU_READ_MOSTLY(int, sched_load_boost);
