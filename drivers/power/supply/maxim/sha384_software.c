@@ -36,6 +36,7 @@
 #include <linux/string.h>
 #define SHA3_256_HMAC
 #include "sha384_software.h"
+#include <linux/slab.h>
 
 //---------------------------------------------------------------------------
 /// Compute HMAC using SHA3-256.
@@ -61,49 +62,78 @@
 ///
 int sha3_256_hmac(unsigned char *key, int key_len, unsigned char *message, int msg_len, unsigned char *mac)
 {
-	int i;
-	unsigned char thash[256];
-	unsigned char tmac[256];
-	unsigned char cat_input_thash[1024];
-	unsigned char cat_input_final[1024];
+    int i;
+    int blocksize = 136;
+    int hashsize = 32;
 
-	int blocksize = 136;
-	int hashsize = 32;
-	unsigned char opad[136];
-	unsigned char ipad[136];
+    // Allocate memory dynamically
+    unsigned char *thash = kmalloc(256, GFP_KERNEL);
+    unsigned char *tmac = kmalloc(256, GFP_KERNEL);
+    unsigned char *cat_input_thash = kmalloc(1024, GFP_KERNEL);
+    unsigned char *cat_input_final = kmalloc(1024, GFP_KERNEL);
+    unsigned char *opad = kmalloc(136, GFP_KERNEL);
+    unsigned char *ipad = kmalloc(136, GFP_KERNEL);
 
-	memset(opad, 0x5C, blocksize);
-	memset(ipad, 0x36, blocksize);
+    // Check for allocation failure
+    if (!thash || !tmac || !cat_input_thash || !cat_input_final || !opad || !ipad) {
+        kfree(thash);
+        kfree(tmac);
+        kfree(cat_input_thash);
+        kfree(cat_input_final);
+        kfree(opad);
+        kfree(ipad);
+        return -ENOMEM;
+    }
 
-	//  Check to see if key is larger then blocksize
-	if (key_len > blocksize)
-		return 0;  // Not supported
+    memset(opad, 0x5C, blocksize);
+    memset(ipad, 0x36, blocksize);
 
-	// check for blocks too big
-	if (msg_len > 512)
-		return 0;
+    // Check key size
+    if (key_len > blocksize) {
+        kfree(thash);
+        kfree(tmac);
+        kfree(cat_input_thash);
+        kfree(cat_input_final);
+        kfree(opad);
+        kfree(ipad);
+        return 0;  // Not supported
+    }
 
-	// Loop through bytes of ipad/opad and XOR with key
-	for (i = 0; i < key_len; i++) {
-		// XOR ipad with key
-		ipad[i] ^= key[i];
-		// XOR opad with key
-		opad[i] ^= key[i];
-	}
+    // Check message size
+    if (msg_len > 512) {
+        kfree(thash);
+        kfree(tmac);
+        kfree(cat_input_thash);
+        kfree(cat_input_final);
+        kfree(opad);
+        kfree(ipad);
+        return 0;
+    }
 
-	// thash = hash(ipad || message)
-	memcpy(cat_input_thash, ipad, blocksize);
-	memcpy(&cat_input_thash[blocksize], message, msg_len);
+    // Loop through bytes of ipad/opad and XOR with key
+    for (i = 0; i < key_len; i++) {
+        ipad[i] ^= key[i];
+        opad[i] ^= key[i];
+    }
 
-	ucl_sha3_256(thash, cat_input_thash, blocksize + msg_len);
+    // thash = hash(ipad || message)
+    memcpy(cat_input_thash, ipad, blocksize);
+    memcpy(&cat_input_thash[blocksize], message, msg_len);
+    ucl_sha3_256(thash, cat_input_thash, blocksize + msg_len);
 
-	// return hash(opad || thash)
-	memcpy(cat_input_final, opad, blocksize);
-	memcpy(&cat_input_final[blocksize], thash, hashsize);
+    // return hash(opad || thash)
+    memcpy(cat_input_final, opad, blocksize);
+    memcpy(&cat_input_final[blocksize], thash, hashsize);
+    ucl_sha3_256(tmac, cat_input_final, blocksize + hashsize);
+    memcpy(mac, tmac, hashsize);
 
-	ucl_sha3_256(tmac, cat_input_final, blocksize + hashsize);
+    // Free allocated memory
+    kfree(thash);
+    kfree(tmac);
+    kfree(cat_input_thash);
+    kfree(cat_input_final);
+    kfree(opad);
+    kfree(ipad);
 
-	memcpy(mac, tmac, hashsize);
-
-	return 1;
+    return 1;
 }
