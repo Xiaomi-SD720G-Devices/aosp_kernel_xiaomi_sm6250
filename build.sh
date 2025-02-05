@@ -73,8 +73,8 @@ function cloneTC() {
     if [ ! -d "${KERNEL_DIR}/clang" ]; then
         mkdir clang && cd clang || exit 1
         echo "Downloading AOSP clang..."
-        wget https://github.com/userariii/AOSP-clang/releases/download/clang-r530567/clang-r530567.tar.gz
-        tar -xf clang*
+        wget "https://github.com/userariii/AOSP-clang/releases/download/clang-r530567/clang-r530567.tar.gz"
+        tar -xvf clang*
         cd .. || exit 1
     else
         echo "Directory 'clang' already exists. Skipping download." | tee -a "$LOG_FILE"

@@ -78,8 +78,8 @@ esac
 if [[ ! -d $C_PATH ]]; then
 	echo -e "\n${YELLOW}Clang not found! Cloning AOSP clang..."
 	mkdir "$C_PATH" && cd "$C_PATH" || exit
-    wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r530567.tar.gz
-    tar -xf clang-r*
+    wget "https://github.com/userariii/AOSP-clang/releases/download/clang-r530567/clang-r530567.tar.gz"
+    tar -xvf clang-r*
 	rm -rf clang-r*
     cd .. || exit 1
 fi
